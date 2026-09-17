@@ -1,0 +1,77 @@
+:root {
+  --primary: #FF6B35;
+  --primary-dark: #E85A28;
+  --primary-light: #FFF0E9;
+  --primary-hover: #E85A28;
+  --primary-soft: #FFF0E9;
+
+  --secondary: #1F2937;
+  --secondary-light: #374151;
+
+  --background: #F8F9FA;
+  --background-secondary: #FFF7F2;
+  --surface: #FFFFFF;
+  --surface-subtle: #FFF7F2;
+  --surface-muted: #F8F9FA;
+  --dark: #111827;
+
+  --text-primary: #1F2937;
+  --text-secondary: #6B7280;
+  --text-muted: #9CA3AF;
+  --text-placeholder: #9CA3AF;
+  --text-disabled: #9CA3AF;
+  --text-white: #FFFFFF;
+
+  --border: #E5E7EB;
+  --border-light: #E5E7EB;
+
+  --success: #22C55E;
+  --success-light: #DCFCE7;
+  --danger: #EF4444;
+  --error: #EF4444;
+  --error-light: #FEE2E2;
+  --warning: #F59E0B;
+  --info: #3B82F6;
+  --rating: #F59E0B;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-2xl: 20px;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.08);
+  --shadow-lg: 0 16px 40px rgba(17, 24, 39, 0.10);
+
+  --font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  --cb-orange: var(--primary);
+  --cb-orange-dark: var(--primary-dark);
+  --cb-orange-light: var(--primary-light);
+  --cb-navy: var(--secondary);
+  --cb-navy-secondary: var(--secondary-light);
+  --cb-bg-main: var(--background);
+  --cb-bg-secondary: var(--background-secondary);
+  --cb-white: var(--surface);
+  --cb-dark: var(--dark);
+  --cb-text-primary: var(--text-primary);
+  --cb-text-secondary: var(--text-secondary);
+  --cb-text-muted: var(--text-muted);
+  --cb-text-white: var(--text-white);
+  --cb-border: var(--border);
+  --cb-success: var(--success);
+  --cb-success-light: var(--success-light);
+  --cb-error: var(--error);
+  --cb-error-light: var(--error-light);
+  --cb-warning: var(--warning);
+  --cb-info: var(--info);
+  --cb-radius-md: var(--radius-md);
+  --cb-radius-lg: var(--radius-lg);
+  --cb-radius-xl: var(--radius-xl);
+  --cb-shadow-sm: var(--shadow-sm);
+  --cb-shadow-md: var(--shadow-md);
+}
+
+.cb-font { font-family: var(--font-family); }
