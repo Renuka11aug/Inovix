@@ -1,90 +1,54 @@
 import React from 'react';
-import { Coffee, ShieldCheck, Soup, Utensils } from 'lucide-react';
-import '../../styles/auth.css';
+import '../../styles/theme.css';
 
-export function CampusBiteLogo({ className = '' }) {
+export default function AuthLayout({ children, title, description }) {
   return (
-    <div className={`auth-logo ${className}`} aria-label="CampusBite">
-      <span className="auth-logo__mark" aria-hidden="true">
-        <Utensils size={22} strokeWidth={2.4} />
-      </span>
-      <span className="auth-logo__word">
-        <span className="auth-logo__campus">Campus</span><span className="auth-logo__bite">Bite</span>
-      </span>
-    </div>
-  );
-}
-
-function AuthVisual() {
-  return (
-    <div className="auth-visual" aria-hidden="true">
-      <div className="auth-visual-card">
-        <div className="auth-food auth-food--bowl">
-          <span className="auth-food__icon"><Soup size={23} /></span>
-          <span className="auth-food__text">
-            <span className="auth-food__label">Fresh bowls</span>
-            <span className="auth-food__meta">near your block</span>
-          </span>
+    <div className="cb-font" style={{ minHeight: '100vh', display: 'flex' }}>
+      {/* LEFT: Branding & Imagery (Desktop Only) */}
+      <div 
+        className="hidden md:flex md:w-[45%] flex-col justify-between p-12"
+        style={{ 
+          backgroundColor: 'var(--bg-secondary)', 
+          background: 'linear-gradient(135deg, #FFF7F2 0%, #FFEEDD 100%)' 
+        }}
+      >
+        <div style={{ color: 'var(--navy)' }}>
+          <h1 style={{ fontSize: '32px', fontWeight: 'bold' }}>CampusBite</h1>
+          <p style={{ marginTop: '16px', fontSize: '24px', fontWeight: 'semibold' }}>
+            Good Food.<br />Great Campus.
+          </p>
         </div>
+        <p style={{ color: 'var(--text-secondary)' }}>
+          Everything you love to eat, right on your campus.
+        </p>
+      </div>
 
-        <div className="auth-food auth-food--coffee">
-          <span className="auth-food__icon"><Coffee size={23} /></span>
-          <span className="auth-food__text">
-            <span className="auth-food__label">Cafe runs</span>
-            <span className="auth-food__meta">between classes</span>
-          </span>
-        </div>
-
-        <div className="auth-campus">
-          <span className="auth-campus__window auth-campus__window--left" />
-          <span className="auth-campus__window auth-campus__window--right" />
-          <span className="auth-campus__door" />
-          <span className="auth-campus__steps" />
+      {/* RIGHT: Auth Form */}
+      <div className="w-full md:w-[55%] flex items-center justify-center p-6" style={{ backgroundColor: 'var(--bg-main)' }}>
+        <div className="w-full max-w-[420px]">
+          {/* Logo on mobile */}
+          <div className="md:hidden mb-8 text-center" style={{ color: 'var(--navy)', fontSize: '24px', fontWeight: 'bold' }}>
+            CampusBite
+          </div>
+          
+          <div 
+            className="p-8 md:p-10"
+            style={{ 
+              backgroundColor: 'var(--white)', 
+              borderRadius: 'var(--radius-xl)',
+              boxShadow: 'var(--shadow-md)',
+              border: '1px solid var(--border)'
+            }}
+          >
+            {title && <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--text-primary)' }}>{title}</h2>}
+            {description && <p style={{ marginTop: '8px', color: 'var(--text-secondary)' }}>{description}</p>}
+            
+            <div className="mt-8">
+              {children}
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  );
-}
-
-export default function AuthLayout({ children, title, description, icon: Icon }) {
-  return (
-    <main className="auth-shell cb-font">
-      <section className="auth-brand-panel" aria-label="CampusBite brand">
-        <div className="auth-brand-content">
-          <CampusBiteLogo />
-          <h1 className="auth-brand-title">Good Food.<br />Great Campus.</h1>
-          <p className="auth-brand-copy">Everything you love to eat, right on your campus.</p>
-          <AuthVisual />
-        </div>
-
-        <div className="auth-brand-footnote">
-          <ShieldCheck size={18} aria-hidden="true" />
-          <span>Student-first ordering, built for campus life.</span>
-        </div>
-      </section>
-
-      <section className="auth-form-panel" aria-label="Authentication form">
-        <div className="auth-form-wrap">
-          <div className="auth-mobile-logo">
-            <CampusBiteLogo />
-          </div>
-
-          <div className="auth-card">
-            {(title || description || Icon) && (
-              <header className="auth-form-header">
-                {Icon ? (
-                  <span className="auth-page-icon" aria-hidden="true">
-                    <Icon size={25} />
-                  </span>
-                ) : null}
-                {title ? <h2 className="auth-title">{title}</h2> : null}
-                {description ? <p className="auth-description">{description}</p> : null}
-              </header>
-            )}
-            {children}
-          </div>
-        </div>
-      </section>
-    </main>
   );
 }

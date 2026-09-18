@@ -1,0 +1,203 @@
+/* ═══════════════════════════════════════════════════════════════════
+   CampusBite Left Sidebar
+   Collapsed: 84px  |  Expanded (hover): 220px
+   Fixed below the 80px navbar
+   ═══════════════════════════════════════════════════════════════════ */
+
+.cb-sidebar {
+  /* ── Brand tokens (same palette as navbar) ── */
+  --s-primary:       #B4003A;
+  --s-primary-dark:  #8F002D;
+  --s-primary-light: #FFF1F3;
+  --s-bg:            #FFFFFF;
+  --s-bg-soft:       #FAFAFB;
+  --s-text:          #182337;
+  --s-text-2:        #737C8C;
+  --s-text-muted:    #9BA5B4;
+  --s-border:        #E8E4E5;
+
+  /* ── Layout ── */
+  --s-collapsed:     84px;
+  --s-expanded:      220px;
+  --s-nav-top:       80px;   /* navbar height — keep in sync with --n-height */
+  --s-item-h:        48px;
+  --s-ease:          220ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ── Applied ── */
+  position: fixed;
+  top: var(--s-nav-top);
+  left: 0;
+  bottom: 0;
+  z-index: 200;
+  width: var(--s-collapsed);
+  overflow: hidden;           /* hides labels while collapsed */
+  background: var(--s-bg);
+  border-right: 1px solid var(--s-border);
+  display: flex;
+  flex-direction: column;
+  font-family: 'Inter', system-ui, sans-serif;
+
+  transition: width var(--s-ease), box-shadow var(--s-ease);
+}
+
+/* ── Expanded on hover/focus-within ── */
+.cb-sidebar:hover,
+.cb-sidebar:focus-within {
+  width: var(--s-expanded);
+  box-shadow: 4px 0 20px rgba(24, 35, 55, 0.07);
+}
+
+/* ─── Inner scroll region (main items) ──────────────────────────── */
+.cb-sidebar__main {
+  flex: 1;
+  overflow: hidden;
+  padding: 12px 6px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* ─── Bottom area (Settings) ─────────────────────────────────────── */
+.cb-sidebar__bottom {
+  padding: 12px 6px 14px;
+  border-top: 1px solid var(--s-border);
+}
+
+/* ─── Nav item ───────────────────────────────────────────────────── */
+.cb-sidebar__item {
+  display: flex;
+  align-items: center;
+  /* When collapsed the icon needs to be centred in the 84px bar.
+     padding-left = (84 - 28icon) / 2 = 28px.
+     When expanded the label needs room → handled by gap. */
+  gap: 13px;
+  height: var(--s-item-h);
+  padding: 0 0 0 28px;
+  border-radius: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--s-text-2);
+  text-align: left;
+  white-space: nowrap;
+  width: 100%;
+  transition: color var(--s-ease), background var(--s-ease);
+}
+
+/* Icon wrapper — always 28px square, centered, never shrinks */
+.cb-sidebar__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  color: inherit;
+  transition: color var(--s-ease);
+}
+
+/* Label — present in DOM but invisible until sidebar expands */
+.cb-sidebar__label {
+  opacity: 0;
+  transform: translateX(-6px);
+  transition:
+    opacity    var(--s-ease),
+    transform  var(--s-ease);
+  overflow: hidden;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Reveal labels when sidebar is wide */
+.cb-sidebar:hover  .cb-sidebar__label,
+.cb-sidebar:focus-within .cb-sidebar__label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ── Hover state ── */
+.cb-sidebar__item:hover {
+  color: var(--s-text);
+  background: var(--s-bg-soft);
+}
+.cb-sidebar__item:hover .cb-sidebar__icon {
+  color: var(--s-text);
+}
+
+/* ── Active state ── */
+.cb-sidebar__item--active {
+  color: var(--s-primary);
+  background: var(--s-primary-light);
+}
+.cb-sidebar__item--active .cb-sidebar__icon {
+  color: var(--s-primary);
+}
+.cb-sidebar__item--active:hover {
+  background: #fde8ed;   /* slightly deeper soft-pink on hover */
+}
+
+/* ── Focus-visible ring ── */
+.cb-sidebar__item:focus-visible {
+  outline: 2px solid var(--s-primary);
+  outline-offset: 2px;
+}
+
+/* ─── Tooltip (shown while collapsed so users know what each icon is) */
+.cb-sidebar__item {
+  position: relative;
+}
+.cb-sidebar__tooltip {
+  /* Invisible by default */
+  position: absolute;
+  left: calc(var(--s-collapsed) - 10px);   /* just outside the collapsed bar */
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--s-text);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 120ms ease;
+  z-index: 500;
+  /* small left-pointing arrow */
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.15));
+}
+.cb-sidebar__tooltip::before {
+  content: '';
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 5px solid transparent;
+  border-right-color: var(--s-text);
+}
+
+/* Show tooltip only when sidebar is NOT expanded (hover on item while collapsed) */
+.cb-sidebar:not(:hover):not(:focus-within) .cb-sidebar__item:hover .cb-sidebar__tooltip {
+  opacity: 1;
+}
+
+/* ─── Responsive ─────────────────────────────────────────────────── */
+
+/* Tablet 768–1023px: sidebar stays but stays collapsed, no expand-on-hover */
+@media (max-width: 1023px) {
+  .cb-sidebar:hover,
+  .cb-sidebar:focus-within {
+    width: var(--s-collapsed);
+    box-shadow: none;
+  }
+  /* Tooltips always visible on hover for tablet */
+  .cb-sidebar__item:hover .cb-sidebar__tooltip { opacity: 1; }
+}
+
+/* Mobile <768px: sidebar hidden — bottom-nav takes over */
+@media (max-width: 767px) {
+  .cb-sidebar { display: none; }
+}
