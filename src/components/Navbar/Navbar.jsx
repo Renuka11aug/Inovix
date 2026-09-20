@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Bell,
   ShoppingBag,
@@ -8,7 +9,10 @@ import {
   ClipboardList,
   Search,
   X,
+  MapPin,
+  UtensilsCrossed,
 } from 'lucide-react';
+import { outlets, menuItems } from '../../mockData';
 import './Navbar.css';
 
 /* ─── Static config (kept for mobile bottom-nav) ────────────────── */
@@ -59,31 +63,176 @@ function Wordmark() {
   );
 }
 
-/* ─── Search bar (desktop, inside navbar) ────────────────────────── */
+/* ─── Search bar with suggestions ───────────────────────────────── */
 function NavSearch({ value, onChange }) {
+  const navigate       = useNavigate();
+  const [open, setOpen] = useState(false);
+  const wrapRef         = useRef(null);
+  const inputRef        = useRef(null);
+
+  /* ── Build suggestions ── */
+  const suggestions = useCallback(() => {
+    const q = value.trim().toLowerCase();
+    if (!q) return { outletHits: [], foodHits: [] };
+
+    const outletHits = outlets
+      .filter((o) =>
+        o.name.toLowerCase().includes(q) ||
+        (o.cuisine || []).some((c) => c.toLowerCase().includes(q)) ||
+        (o.tags || '').toLowerCase().includes(q)
+      )
+      .slice(0, 4);
+
+    const foodHits = menuItems
+      .filter((m) =>
+        m.name.toLowerCase().includes(q) ||
+        (m.desc || '').toLowerCase().includes(q) ||
+        (m.category || '').toLowerCase().includes(q)
+      )
+      .slice(0, 5);
+
+    return { outletHits, foodHits };
+  }, [value]);
+
+  const { outletHits, foodHits } = suggestions();
+  const hasResults = outletHits.length > 0 || foodHits.length > 0;
+
+  /* ── Close on outside click ── */
+  useEffect(() => {
+    if (!open) return;
+    function handler(e) {
+      if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false);
+    }
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+
+  /* ── Close on Escape ── */
+  useEffect(() => {
+    if (!open) return;
+    function handler(e) { if (e.key === 'Escape') { setOpen(false); inputRef.current?.blur(); } }
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [open]);
+
+  function handleSelect(path) {
+    onChange('');
+    setOpen(false);
+    inputRef.current?.blur();
+    navigate(path);
+  }
+
+  function handleChange(v) {
+    onChange(v);
+    setOpen(v.length > 0);
+  }
+
   return (
-    <div className="cb-nav__search">
+    <div className="cb-nav__search" ref={wrapRef} style={{ position: 'relative' }}>
+      {/* Input */}
       <div className="cb-nav__search-inner">
         <Search size={15} className="cb-nav__search-icon" aria-hidden="true" />
         <input
+          ref={inputRef}
           className="cb-nav__search-input"
           type="search"
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => handleChange(e.target.value)}
+          onFocus={() => { if (value.length > 0) setOpen(true); }}
           placeholder="What are you craving today?"
           aria-label="Search food, dishes or outlets"
+          aria-expanded={open}
+          aria-haspopup="listbox"
           autoComplete="off"
         />
         {value && (
           <button
             className="cb-nav__search-clear"
-            onClick={() => onChange('')}
+            onClick={() => { onChange(''); setOpen(false); }}
             aria-label="Clear search"
+            tabIndex={0}
           >
             <X size={11} aria-hidden="true" />
           </button>
         )}
       </div>
+
+      {/* Dropdown */}
+      {open && value.trim().length > 0 && (
+        <div className="cb-search-drop" role="listbox" aria-label="Search suggestions">
+
+          {!hasResults && (
+            <div className="cb-search-drop__empty">
+              No results for <strong>"{value}"</strong>
+            </div>
+          )}
+
+          {/* Outlets group */}
+          {outletHits.length > 0 && (
+            <div className="cb-search-drop__group">
+              <p className="cb-search-drop__group-label">
+                <MapPin size={11} aria-hidden="true" /> Outlets
+              </p>
+              {outletHits.map((o) => (
+                <button
+                  key={o.id}
+                  role="option"
+                  className="cb-search-drop__item"
+                  onClick={() => handleSelect(`/student/outlets/${o.id}`)}
+                >
+                  <span className="cb-search-drop__icon cb-search-drop__icon--outlet">🏪</span>
+                  <span className="cb-search-drop__info">
+                    <span className="cb-search-drop__name">{o.name}</span>
+                    <span className="cb-search-drop__sub">{o.tags}</span>
+                  </span>
+                  <span className={`cb-search-drop__status cb-search-drop__status--${o.status}`}>
+                    {o.status === 'open' ? 'Open' : o.status === 'busy' ? 'Busy' : 'Closed'}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Divider between groups */}
+          {outletHits.length > 0 && foodHits.length > 0 && (
+            <div className="cb-search-drop__divider" />
+          )}
+
+          {/* Food group */}
+          {foodHits.length > 0 && (
+            <div className="cb-search-drop__group">
+              <p className="cb-search-drop__group-label">
+                <UtensilsCrossed size={11} aria-hidden="true" /> Food
+              </p>
+              {foodHits.map((m) => {
+                const outletName = outlets.find((o) => o.id === m.outletId)?.name ?? '';
+                return (
+                  <button
+                    key={m.id}
+                    role="option"
+                    className="cb-search-drop__item"
+                    onClick={() => handleSelect(`/student/food/${m.id}`)}
+                  >
+                    <span className="cb-search-drop__thumb">
+                      {m.image
+                        ? <img src={m.image} alt="" />
+                        : '🍽️'}
+                    </span>
+                    <span className="cb-search-drop__info">
+                      <span className="cb-search-drop__name">{m.name}</span>
+                      <span className="cb-search-drop__sub">{outletName} · ₹{m.price}</span>
+                    </span>
+                    {m.veg !== undefined && (
+                      <span className={`cb-search-drop__veg cb-search-drop__veg--${m.veg ? 'veg' : 'nonveg'}`} aria-label={m.veg ? 'Veg' : 'Non-veg'} />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+        </div>
+      )}
     </div>
   );
 }

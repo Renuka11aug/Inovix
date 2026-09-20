@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search } from 'lucide-react';
 import { outlets } from '../../mockData';
 import './outlets.css';
 
@@ -65,32 +64,16 @@ function OutletCard({ outlet }) {
    Outlets page
    ═══════════════════════════════════════════════════════════════════ */
 export default function Outlets() {
-  const [query,      setQuery]      = useState('');
-  const [activeFilter, setFilter]   = useState('All');
+  const [activeFilter, setFilter] = useState('All');
 
   const filtered = useMemo(() => {
-    let list = outlets;
-
-    if (activeFilter === 'Open Now') {
-      list = list.filter((o) => o.status !== 'closed');
-    } else if (activeFilter !== 'All') {
-      list = list.filter((o) =>
-        o.cuisine.some((c) => c.toLowerCase() === activeFilter.toLowerCase()) ||
-        o.tags.toLowerCase().includes(activeFilter.toLowerCase())
-      );
-    }
-
-    if (query.trim()) {
-      const q = query.toLowerCase();
-      list = list.filter((o) =>
-        o.name.toLowerCase().includes(q) ||
-        o.tags.toLowerCase().includes(q) ||
-        o.cuisine.some((c) => c.toLowerCase().includes(q))
-      );
-    }
-
-    return list;
-  }, [query, activeFilter]);
+    if (activeFilter === 'Open Now') return outlets.filter((o) => o.status !== 'closed');
+    if (activeFilter === 'All')      return outlets;
+    return outlets.filter((o) =>
+      o.cuisine.some((c) => c.toLowerCase() === activeFilter.toLowerCase()) ||
+      o.tags.toLowerCase().includes(activeFilter.toLowerCase())
+    );
+  }, [activeFilter]);
 
   return (
     <div className="ol">
@@ -100,17 +83,6 @@ export default function Outlets() {
         <div className="ol__head">
           <h1 className="ol__title">Campus Outlets</h1>
           <p className="ol__sub">Find your favourite food on campus.</p>
-        </div>
-
-        {/* Search */}
-        <div className="ol__search">
-          <Search size={16} aria-hidden="true" />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search outlets or cuisines…"
-            aria-label="Search outlets"
-          />
         </div>
 
         {/* Filter chips */}
